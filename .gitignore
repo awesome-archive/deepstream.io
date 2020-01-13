@@ -1,3 +1,11 @@
+.nyc_combined_coverage
+dist
+.DS_Store
+.vscode/settings.json
+.nyc_output
+temp-e2e-test
+local-storage
+
 # Logs
 logs
 *.log
@@ -29,6 +37,7 @@ build/Release
 # https://www.npmjs.org/doc/misc/npm-faq.html#should-i-check-my-node_modules-folder-into-git-
 node_modules
 npm-shrinkwrap.json
+npm-debug.*
 
 # Users Environment Variables
 .lock-wscript
@@ -37,3 +46,6 @@ npm-shrinkwrap.json
 .idea
 
 licenses.json
+
+# Typescript
+dist

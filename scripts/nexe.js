@@ -1,16 +1,28 @@
-const nexe = require( 'nexe' );
-nexe.compile( {
-		flags: true,
-		input: "bin/deepstream",
-		output: process.env.EXECUTABLE_NAME,
-		nodeVersion: process.env.NODE_VERSION_WITHOUT_V,
-		nodeTempDir: "nexe_node",
-		framework: "node",
-		resourceFiles: [ "ascii-logo.txt" ]
-	},
-	function(error) {
-		if ( error ) {
-			return console.error( error.message );
-		}
-	}
-);
+const version = require('../package')
+const nexe = require('nexe') // eslint-disable-line
+
+nexe.compile({
+  input: 'dist/bin/deepstream.js',
+  build: false,
+  flags: ['--max-old-space-size=8192'],
+  output: process.env.EXECUTABLE_NAME,
+  target: { version: '10.16.0' },
+  temp: 'nexe_node',
+  resources: [
+    './dist/ascii-logo.txt',
+    './dist/package.json'
+  ],
+  ico: 'scripts/resources/deepstream.ico',
+  rc: {
+    CompanyName: "deepstreamHub GmbH",
+    ProductName: "deepstream.io",
+    FileDescription: "A Scalable Server for Realtime Applications",
+    FileVersion: version,
+    ProductVersion: version,
+    OriginalFilename: "deepstream.exe",
+    InternalName: "deepstream",
+    LegalCopyright: "MIT"
+  }
+}).then(() => {
+  console.log('success')
+})

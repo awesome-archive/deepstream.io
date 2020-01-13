@@ -1,56 +1,132 @@
 {
-  "name": "deepstream.io",
-  "version": "1.1.0",
+  "name": "@deepstream/server",
+  "version": "5.0.5",
   "description": "a scalable server for realtime webapps",
-  "main": "src/deepstream.io.js",
+  "main": "./dist/src/deepstream.io.js",
   "bin": {
-    "deepstream": "./bin/deepstream"
+    "deepstream": "./dist/bin/deepstream"
   },
   "directories": {
     "test": "test"
   },
   "scripts": {
-    "coverage": "istanbul cover node_modules/jasmine/bin/jasmine.js JASMINE_CONFIG_PATH=jasmine.json -x **/pid-helper.js",
-    "watch": "node node_modules/watch/cli.js \"npm test\" ./src ./test",
-    "reporter": "node jasmine-runner",
-    "test": "jasmine JASMINE_CONFIG_PATH=jasmine.json",
-    "test-http-server": "node test/test-helper/start-test-server.js",
-    "license": "mkdir -p build && node scripts/license-aggregator > build/LICENSE && cat scripts/resources/missing-licenses.txt >> build/LICENSE"
+    "start:inspect": "npm run tsc && node --inspect dist/bin/deepstream",
+    "start": "ts-node --transpile-only --project tsconfig.json --files ./bin/deepstream.ts",
+    "tsc": "sh scripts/tsc.sh",
+    "license": "mkdir -p build && node scripts/license-aggregator > build/LICENSE && cat scripts/resources/missing-licenses.txt >> build/LICENSE",
+    "lint": "tslint --project .",
+    "lint:fix": "npm run lint -- --fix",
+    "test": "mocha --opts src/test/mocha.opts 'src/**/*.spec.ts'",
+    "test:coverage": "nyc mocha --opts src/test/mocha.opts 'src/**/*.spec.ts' && npm run test:coverage:combine",
+    "test:http-server": "node test/test-helper/start-test-server.js",
+    "e2e": "ts-node --transpile-only --project tsconfig.json --files ./node_modules/.bin/cucumber-js test-e2e --require './test-e2e/steps/**/*.ts' --exit",
+    "e2e:v3": "V3=true npm run e2e -- --tags \"not @V4\"",
+    "e2e:uws": "uws=true npm run e2e",
+    "e2e:uws:v3": "uws=true V3=true npm run e2e -- --tags \"not @V4\"",
+    "e2e:rpc": "npm run e2e -- --tags \"@rpcs\"",
+    "e2e:event": "npm run e2e -- --tags \"@events\"",
+    "e2e:record": "npm run e2e -- --tags \"@records\"",
+    "e2e:login": "npm run e2e -- --tags \"@login\"",
+    "e2e:presence": "npm run e2e -- --tags \"@presence\"",
+    "e2e:http": "npm run e2e -- --tags \"@http\"",
+    "e2e:coverage": "nyc cucumber-js test-e2e --require './test-e2e/steps/**/*.ts' --exit && npm run test:coverage:combine",
+    "test:all:coverage": "rm -rf .nyc_combined_coverage .nyc_output && npm run test:coverage && npm run e2e:coverage && nyc report --reporter=lcov -t .nyc_combined_coverage",
+    "test:coverage:combine": "rm -rf .nyc_output/processinfo && mkdir -p .nyc_combined_coverage && mv -f .nyc_output/* .nyc_combined_coverage/"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/deepstreamIO/deepstream.io.git"
   },
-  "optionalDependencies": {
-    "uws": "^0.9.0"
-  },
   "dependencies": {
-    "adm-zip": "^0.4.7",
-    "colors": "^1.0.3",
-    "commander": "^2.9.0",
-    "engine.io": "1.6.11",
-    "glob": "^7.0.5",
-    "js-yaml": "^3.6.1",
-    "mkdirp": "^0.5.1",
-    "needle": "^1.1.0"
+    "@deepstream/protobuf": "^1.0.1",
+    "@deepstream/types": "^2.0.7",
+    "ajv": "^6.10.2",
+    "better-ajv-errors": "^0.6.7",
+    "body-parser": "^1.19.0",
+    "chalk": "^2.4.2",
+    "commander": "^4.0.1",
+    "content-type": "^1.0.4",
+    "glob": "^7.1.6",
+    "http-shutdown": "^1.2.1",
+    "http-status": "^1.4.1",
+    "js-yaml": "^3.13.1",
+    "mqtt-connection": "^4.0.0",
+    "needle": "^2.4.0",
+    "pino": "^5.14.0",
+    "source-map-support": "^0.5.16",
+    "uWebSockets.js": "github:uNetworking/uWebSockets.js#v16.1.0",
+    "uuid": "^3.3.3",
+    "ws": "^7.2.0"
   },
   "devDependencies": {
-    "async": "^0.2.9",
-    "coveralls": "^2.11.12",
-    "engine.io-client": "^1.6.11",
-    "grunt": "^1.0.1",
-    "istanbul": "^0.4.4",
-    "jasmine": "^2.5.2",
-    "jasmine-spec-reporter": "^2.5.0",
+    "@deepstream/client": "^5.0.4",
+    "@types/adm-zip": "^0.4.32",
+    "@types/body-parser": "^1.17.1",
+    "@types/content-type": "^1.1.3",
+    "@types/cucumber": "^4.0.7",
+    "@types/js-yaml": "^3.12.1",
+    "@types/mkdirp": "^0.5.2",
+    "@types/mocha": "^5.2.7",
+    "@types/needle": "^2.0.4",
+    "@types/node": "^12.12.12",
+    "@types/pino": "^5.8.13",
+    "@types/sinon": "^7.5.1",
+    "@types/sinon-chai": "^3.2.3",
+    "@types/uuid": "^3.4.6",
+    "@types/ws": "^6.0.3",
+    "async": "^3.1.0",
+    "chai": "^4.2.0",
+    "coveralls": "^3.0.8",
+    "cucumber": "^5.0.2",
+    "deepstream.io-client-js": "^2.3.4",
+    "husky": "^3.1.0",
+    "istanbul": "^0.4.5",
+    "mocha": "^6.2.2",
     "n0p3": "^1.0.2",
-    "nexe": "^1.1.2",
-    "proxyquire": "1.7.10",
-    "watch": "^0.19.2"
+    "nexe": "^3.3.2",
+    "nyc": "^14",
+    "proxyquire": "^2.1.3",
+    "sinon": "^7.5.0",
+    "sinon-chai": "^3.3.0",
+    "ts-essentials": "^3.0.5",
+    "ts-node": "^8.5.2",
+    "tslint": "^5.20.1",
+    "typescript": "^3.7.2",
+    "watch": "^1.0.2"
   },
   "author": "deepstreamHub GmbH",
-  "license": "AGPL-3.0",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/deepstreamIO/deepstream.io/issues"
   },
-  "homepage": "http://deepstream.io"
+  "homepage": "http://deepstream.io",
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint && npm run tsc",
+      "pre-push": "npm run tsc && npm t && npm run e2e -- --fail-fast && npm run e2e:v3 -- --fail-fast && npm run e2e:uws -- --fail-fast && sh scripts/package.sh true true && node scripts/node-test.js",
+      "pre-publish": "npm run tsc"
+    }
+  },
+  "nyc": {
+    "include": [
+      "src/**/*.ts"
+    ],
+    "exclude": [
+      "src/**/*.spec.ts",
+      "src/connection-endpoint/json/*",
+      "src/connection-endpoint/mqtt/*",
+      "src/connection-endpoint/text/*"
+    ],
+    "extension": [
+      ".ts"
+    ],
+    "require": [
+      "ts-node/register/transpile-only"
+    ],
+    "reporter": [
+      "lcov"
+    ],
+    "sourceMap": true,
+    "instrument": true
+  }
 }
